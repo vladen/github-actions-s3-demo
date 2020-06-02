@@ -1,68 +1,43 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project uses GitHub action to deploy static website to AWS S3 bucket configured as a web server.
 
-## Available Scripts
+> assuming that your site has been created with `create-react-app`
 
-In the project directory, you can run:
+## Install dependencies and ensure that `package-lock.json` file exists
 
-### `yarn start`
+`npm install`
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Check if build script successfully runs and emits production version of the web site
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+`npm run build` should create `build` folder containing `index.html` file and other assets
 
-### `yarn test`
+## Add github action to deploy `build` folder to AWS S3 bucket
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+copy `.github/workflows/deploy-to-aws.yml` file into your repo
 
-### `yarn build`
+## Explore contents of the workflow file and note that it refers to several secrets
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+* AWS_S3_BUCKET
+* AWS_ACCESS_KEY_ID
+* AWS_SECRET_ACCESS_KEY
+* AWS_REGION
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+## Create AWS account
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Create AWS access key
 
-### `yarn eject`
+1. Go to [AWS security credentials](https://console.aws.amazon.com/iam/home?region=us-east-1#/security_credentials) to create new access key. Use [this manual](https://docs.aws.amazon.com/general/latest/gr/managing-aws-access-keys.html) for more details.
+2. Go to [GitHub](https://github.com) to define `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` secrets in `Settings -> Secrets` of your repository.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Create AWS S3 bucket
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. Go to [AWS S3 control panel](https://s3.console.aws.amazon.com/s3/buckets) and create a new bucket.
+2. Enable static website hosting in properties of newly created bucket.
+3. Return to [GitHub](https://github.com) to define remaining secrets. Use
+    * name of new bucket as bucket `AWS_S3_BUCKET`
+    * and `us-east-1` for `AWS_REGION`.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Commit and push your local changes to GitHub to trigger new worflow.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+1. Go to [GitHub](https://github.com) `Actions -> Deploy to AWS -> Your latest commit -> Job` report
+2. Check that all hob steps are successfully executed
+3. Enjoy your site up and running on the `http://{your-bucket-name}.s3-website-us-east-1.amazonaws.com` address
